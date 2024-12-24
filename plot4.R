@@ -1,20 +1,5 @@
-# initialize constants
-dataURL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
-dataDir <- "data"
-zipFilePath <- file.path(dataDir, "power_consumption.zip")
-
-# setup directory and download zip file if needed
-if(!file.exists(zipFilePath)) {
-  if(!dir.exists("data")) dir.create(dataDir)
-  download.file(dataURL, zipFilePath, method = "curl")
-}
-# unzip file and load data.frame
-dataFile <- unzip(zipFilePath, exdir = dataDir)
-power <- read.table(dataFile, header = TRUE, sep = ";", comment.char = "", na.strings = "?")
-# subset data.frame to only needed rows
-power <- power[power$Date == "1/2/2007" | power$Date == "2/2/2007",]
-# convert time column to a POSIXlt datetime object
-power$Time <- strptime(paste(power$Date, power$Time), "%d/%m/%Y %H:%M:%S")
+# load data
+source("loadData.R")
 
 # launch png graphics device
 png("plot4.png", bg = "transparent", type = "cairo")
@@ -28,10 +13,8 @@ with(power, {
   axis.POSIXct(1, at = seq(min(Time), by = "day", length.out = 3), format = "%a")
   
   ## second plot: bottom-left
-  # initialize the plot of sub-metering active energy against time without drawing any data (type = "n") or the x-axis (xaxt = "n")
-  plot(Time ,Sub_metering_1, type = "n", xaxt = "n",  xlab = "", ylab = "Energy sub metering")
-  # add the line graph of sub_metering_1 active energy against time to the plot in black
-  lines(Time, Sub_metering_1, col = "black")
+  # plot a line graph of sub_metering_1 active energy against time without drawing x-axis (xaxt = "n")
+  plot(Time , Sub_metering_1, type = "l", xaxt = "n",  xlab = "", ylab = "Energy sub metering")
   # add the line graph of sub_metering_2 active energy against time to the plot in red
   lines(Time, Sub_metering_2, col = "red")
   # add the line graph of sub_metering_3 active energy against time to the plot in blue
